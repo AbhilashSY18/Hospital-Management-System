@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(pageTitle='Manage Beds', activePage='beds', content=~{::content})}">
+<body>
+<th:block th:fragment="content">
+
+<div class="row g-3">
+    <!-- Add Bed Form (Admin only) -->
+    <div class="col-md-4" sec:authorize="hasRole('ADMIN')">
+        <div class="card h-100">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-plus-circle me-2 text-primary"></i>Add New Bed</h6>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/beds/add}" method="post" th:object="${newBed}">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Bed Number</label>
+                        <input type="text" th:field="*{bedNumber}" class="form-control" placeholder="e.g. ICU-06" required/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Ward Type</label>
+                        <select th:field="*{wardType}" class="form-select">
+                            <option th:each="w : ${wardTypes}" th:value="${w}" th:text="${w}">WARD</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Location</label>
+                        <input type="text" th:field="*{location}" class="form-control" placeholder="e.g. Floor 2, Room 201"/>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-plus-lg me-1"></i>Add Bed
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bed List -->
+    <div th:classappend="${#authorization.expression('hasRole(''ADMIN'')')} ? 'col-md-8' : 'col-12'">
+        <div class="card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-columns-gap me-2 text-primary"></i>All Beds</h6>
+                <!-- Summary badges -->
+                <div class="d-flex gap-2 flex-wrap">
+                    <span class="badge badge-available px-2 py-1">
+                        Available: <span th:text="${#lists.size(beds.?[status.name() == 'AVAILABLE'])}">0</span>
+                    </span>
+                    <span class="badge badge-occupied px-2 py-1">
+                        Occupied: <span th:text="${#lists.size(beds.?[status.name() == 'OCCUPIED'])}">0</span>
+                    </span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Bed No.</th><th>Ward</th><th>Location</th><th>Status</th>
+                                <th sec:authorize="hasAnyRole('ADMIN','NURSE')">Update Status</th>
+                                <th sec:authorize="hasRole('ADMIN')">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="bed : ${beds}">
+                                <td class="fw-semibold" th:text="${bed.bedNumber}">BED</td>
+                                <td><span class="badge bg-secondary" th:text="${bed.wardType}">WARD</span></td>
+                                <td class="text-muted small" th:text="${bed.location}">-</td>
+                                <td>
+                                    <span th:class="'badge ' +
+                                        (${bed.status.name() == 'AVAILABLE'} ? 'badge-available' :
+                                        (${bed.status.name() == 'OCCUPIED'} ? 'badge-occupied' :
+                                        (${bed.status.name() == 'CLEANING'} ? 'badge-cleaning' : 'badge-maintenance')))"
+                                        th:text="${bed.status}">STATUS</span>
+                                </td>
+                                <td sec:authorize="hasAnyRole('ADMIN','NURSE')">
+                                    <form th:action="@{/beds/status/{id}(id=${bed.bedId})}" method="post" class="d-flex gap-1">
+                                        <select name="status" class="form-select form-select-sm" style="width:140px;">
+                                            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"
+                                                    th:selected="${s == bed.status}">S</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-check2"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                                <td sec:authorize="hasRole('ADMIN')">
+                                    <form th:action="@{/beds/delete/{id}(id=${bed.bedId})}" method="post"
+                                          onsubmit="return confirm('Delete this bed?')">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr th:if="${beds.isEmpty()}">
+                                <td colspan="6" class="text-center text-muted py-3">No beds found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</th:block>
+</body>
+</html>

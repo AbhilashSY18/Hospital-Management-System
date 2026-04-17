@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(pageTitle='Admit Patient', activePage='admit', content=~{::content})}">
+<body>
+<th:block th:fragment="content">
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-hospital me-2 text-success"></i>Admit Patient</h6>
+            </div>
+            <div class="card-body p-4">
+                <form th:action="@{/patients/admit}" method="post">
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Select Patient <span class="text-danger">*</span></label>
+                        <select name="patientId" class="form-select" required>
+                            <option value="">-- Choose a registered patient --</option>
+                            <option th:each="p : ${registeredPatients}"
+                                    th:value="${p.patientId}"
+                                    th:text="${p.name} + ' (Age: ' + ${p.age} + ') — ' + ${p.condition}">
+                                Patient
+                            </option>
+                        </select>
+                        <div class="form-text">
+                            Only patients with <span class="badge bg-warning text-dark">REGISTERED</span> status are listed.
+                            <a th:href="@{/patients}">Register a new patient</a> first if needed.
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Select Available Bed <span class="text-danger">*</span></label>
+                        <!-- Filter by ward type -->
+                        <div class="mb-2 d-flex gap-2 flex-wrap">
+                            <span class="text-muted small me-1 align-self-center">Filter by ward:</span>
+                            <th:block th:each="w : ${wardTypes}">
+                                <a th:href="@{/beds/available(wardType=${w})}"
+                                   class="btn btn-sm btn-outline-secondary" th:text="${w}">WARD</a>
+                            </th:block>
+                        </div>
+                        <select name="bedId" class="form-select" required>
+                            <option value="">-- Choose an available bed --</option>
+                            <option th:each="b : ${availableBeds}"
+                                    th:value="${b.bedId}"
+                                    th:text="${b.bedNumber} + ' — ' + ${b.wardType} + ' (' + ${b.location} + ')'">
+                                Bed
+                            </option>
+                        </select>
+                        <div class="form-text text-success">
+                            <i class="bi bi-check-circle me-1"></i>
+                            <span th:text="${availableBeds.size()}">0</span> beds currently available.
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Notes (optional)</label>
+                        <textarea name="notes" class="form-control" rows="3"
+                                  placeholder="Additional notes about admission, special requirements..."></textarea>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="bi bi-check-circle me-2"></i>Confirm Admission
+                        </button>
+                        <a th:href="@{/patients}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Info box -->
+        <div class="alert alert-info mt-3">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Note:</strong> On admission, the selected bed will be marked as
+            <span class="badge badge-occupied">OCCUPIED</span> and the patient status
+            updated to <span class="badge bg-danger">ADMITTED</span>. All observers
+            (dashboard refresh, audit log) will be notified automatically via the Observer pattern.
+        </div>
+    </div>
+</div>
+
+</th:block>
+</body>
+</html>

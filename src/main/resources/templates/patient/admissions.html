@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(pageTitle='Active Admissions', activePage='admissions', content=~{::content})}">
+<body>
+<th:block th:fragment="content">
+
+<div class="card">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+        <h6 class="mb-0 fw-semibold">
+            <i class="bi bi-clipboard2-pulse me-2 text-primary"></i>Active Admissions
+            <span class="badge bg-primary ms-2" th:text="${admissions.size()}">0</span>
+        </h6>
+        <a th:href="@{/patients/admit}" class="btn btn-sm btn-success" sec:authorize="hasAnyRole('ADMIN','DOCTOR')">
+            <i class="bi bi-plus-lg me-1"></i>New Admission
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th><th>Patient</th><th>Condition</th>
+                        <th>Bed</th><th>Ward</th><th>Admitted On</th><th>Notes</th>
+                        <th sec:authorize="hasAnyRole('ADMIN','DOCTOR')">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="a : ${admissions}">
+                        <td class="text-muted small" th:text="${a.admissionId}">#</td>
+                        <td>
+                            <div class="fw-semibold" th:text="${a.patient.name}">Name</div>
+                            <div class="text-muted small">Age: <span th:text="${a.patient.age}">0</span></div>
+                        </td>
+                        <td class="small" th:text="${a.patient.condition}">Condition</td>
+                        <td>
+                            <span class="badge bg-dark" th:text="${a.bed.bedNumber}">BED</span>
+                        </td>
+                        <td><span class="badge bg-secondary" th:text="${a.bed.wardType}">WARD</span></td>
+                        <td class="small" th:text="${#temporals.format(a.admissionDate,'dd MMM yyyy, HH:mm')}">Date</td>
+                        <td class="small text-muted" th:text="${a.notes != null ? a.notes : '—'}">-</td>
+                        <td sec:authorize="hasAnyRole('ADMIN','DOCTOR')">
+                            <div class="d-flex gap-1 flex-wrap">
+                                <!-- Discharge -->
+                                <form th:action="@{/patients/discharge/{id}(id=${a.admissionId})}" method="post"
+                                      onsubmit="return confirm('Discharge this patient?')">
+                                    <button type="submit" class="btn btn-sm btn-outline-success">
+                                        <i class="bi bi-box-arrow-right"></i> Discharge
+                                    </button>
+                                </form>
+                                <!-- Transfer -->
+                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                        data-bs-toggle="modal"
+                                        th:data-bs-target="'#transferModal' + ${a.admissionId}">
+                                    <i class="bi bi-arrow-left-right"></i> Transfer
+                                </button>
+                            </div>
+
+                            <!-- Transfer Modal -->
+                            <div class="modal fade" th:id="'transferModal' + ${a.admissionId}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h6 class="modal-title">Transfer Patient</h6>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <form th:action="@{/patients/transfer/{id}(id=${a.admissionId})}" method="post">
+                                            <div class="modal-body">
+                                                <p class="text-muted small">
+                                                    Transferring: <strong th:text="${a.patient.name}">Name</strong>
+                                                    from bed <strong th:text="${a.bed.bedNumber}">BED</strong>
+                                                </p>
+                                                <label class="form-label fw-semibold">Select New Bed</label>
+                                                <select name="newBedId" class="form-select" required>
+                                                    <option value="">-- Select available bed --</option>
+                                                    <option th:each="b : ${availableBeds}"
+                                                            th:value="${b.bedId}"
+                                                            th:text="${b.bedNumber} + ' — ' + ${b.wardType}">Bed</option>
+                                                </select>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-sm btn-primary">Confirm Transfer</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${admissions.isEmpty()}">
+                        <td colspan="8" class="text-center text-muted py-4">
+                            <i class="bi bi-clipboard2 fs-2 d-block mb-2 opacity-25"></i>
+                            No active admissions
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</th:block>
+</body>
+</html>

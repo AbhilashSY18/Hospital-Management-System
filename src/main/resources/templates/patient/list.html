@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(pageTitle='Patients', activePage='patients', content=~{::content})}">
+<body>
+<th:block th:fragment="content">
+
+<div class="row g-3">
+    <!-- Register Patient Form -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-person-plus me-2 text-primary"></i>Register Patient</h6>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/patients/register}" method="post" th:object="${newPatient}">
+                    <div class="mb-2">
+                        <label class="form-label small fw-semibold">Full Name</label>
+                        <input type="text" th:field="*{name}" class="form-control form-control-sm" required/>
+                    </div>
+                    <div class="row g-2 mb-2">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Age</label>
+                            <input type="number" th:field="*{age}" class="form-control form-control-sm" min="0" max="120"/>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Gender</label>
+                            <select th:field="*{gender}" class="form-select form-select-sm">
+                                <option th:each="g : ${genders}" th:value="${g}" th:text="${g}">G</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-semibold">Contact Number</label>
+                        <input type="text" th:field="*{contactNumber}" class="form-control form-control-sm"/>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-semibold">Medical Condition</label>
+                        <input type="text" th:field="*{condition}" class="form-control form-control-sm"
+                               placeholder="e.g. Cardiac Arrest" required/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Address</label>
+                        <textarea th:field="*{address}" class="form-control form-control-sm" rows="2"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                        <i class="bi bi-person-check me-1"></i>Register Patient
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patient List -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-people me-2 text-primary"></i>All Patients</h6>
+                <a th:href="@{/patients/admit}" class="btn btn-sm btn-success" sec:authorize="hasAnyRole('ADMIN','DOCTOR')">
+                    <i class="bi bi-hospital me-1"></i>Admit Patient
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th><th>Name</th><th>Age</th><th>Condition</th>
+                                <th>Contact</th><th>Status</th><th>Registered</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${patients}">
+                                <td class="text-muted small" th:text="${p.patientId}">#</td>
+                                <td class="fw-semibold" th:text="${p.name}">Name</td>
+                                <td th:text="${p.age}">0</td>
+                                <td class="small" th:text="${p.condition}">Condition</td>
+                                <td class="small" th:text="${p.contactNumber}">-</td>
+                                <td>
+                                    <span th:class="'badge ' +
+                                        (${p.admissionStatus.name() == 'ADMITTED'} ? 'bg-danger' :
+                                        (${p.admissionStatus.name() == 'REGISTERED'} ? 'bg-warning text-dark' : 'bg-secondary'))"
+                                          th:text="${p.admissionStatus}">STATUS</span>
+                                </td>
+                                <td class="small text-muted"
+                                    th:text="${#temporals.format(p.registrationDate,'dd MMM yyyy')}">Date</td>
+                            </tr>
+                            <tr th:if="${patients.isEmpty()}">
+                                <td colspan="7" class="text-center text-muted py-3">No patients found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</th:block>
+</body>
+</html>

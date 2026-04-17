@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(pageTitle='Bed Utilisation Report', activePage='reports', content=~{::content})}">
+<body>
+<th:block th:fragment="content">
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a th:href="@{/reports}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back to Reports
+    </a>
+    <span class="text-muted small">Generated: <span th:text="${generatedAt}">-</span></span>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card text-center">
+            <div class="fs-1 fw-bold text-primary" th:text="${totalBeds}">0</div>
+            <div class="text-muted small">Total Beds</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card text-center">
+            <div class="fs-1 fw-bold text-success" th:text="${availableBeds}">0</div>
+            <div class="text-muted small">Available</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card text-center">
+            <div class="fs-1 fw-bold text-danger" th:text="${occupiedBeds}">0</div>
+            <div class="text-muted small">Occupied</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card text-center">
+            <div class="fs-1 fw-bold text-warning" th:text="${occupancyRate}">0%</div>
+            <div class="text-muted small">Occupancy Rate</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-white py-3">
+        <h6 class="mb-0 fw-semibold"><i class="bi bi-table me-2"></i>Beds Under Maintenance</h6>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">Maintenance beds: <strong th:text="${maintenanceBeds}">0</strong></p>
+        <div class="progress" style="height:20px;">
+            <div class="progress-bar bg-success" role="progressbar"
+                 th:style="'width: ' + (${totalBeds > 0} ? (${availableBeds} * 100 / ${totalBeds}) : 0) + '%'">
+                Available
+            </div>
+            <div class="progress-bar bg-danger" role="progressbar"
+                 th:style="'width: ' + (${totalBeds > 0} ? (${occupiedBeds} * 100 / ${totalBeds}) : 0) + '%'">
+                Occupied
+            </div>
+            <div class="progress-bar bg-warning" role="progressbar"
+                 th:style="'width: ' + (${totalBeds > 0} ? (${maintenanceBeds} * 100 / ${totalBeds}) : 0) + '%'">
+                Maintenance
+            </div>
+        </div>
+    </div>
+</div>
+
+</th:block>
+</body>
+</html>

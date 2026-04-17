@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(pageTitle='Reports', activePage='reports', content=~{::content})}">
+<body>
+<th:block th:fragment="content">
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <div class="mb-3" style="font-size:3rem;color:#0d6efd;">
+                    <i class="bi bi-bar-chart-line"></i>
+                </div>
+                <h6 class="fw-bold">Bed Utilisation Report</h6>
+                <p class="text-muted small">Total, available, occupied and maintenance bed counts. Occupancy rate by ward.</p>
+                <a th:href="@{/reports/beds}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-eye me-1"></i>View Report
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <div class="mb-3" style="font-size:3rem;color:#198754;">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <h6 class="fw-bold">Resource Usage Report</h6>
+                <p class="text-muted small">Medical equipment availability, allocation status, and utilisation rate.</p>
+                <a th:href="@{/reports/resources}" class="btn btn-success btn-sm">
+                    <i class="bi bi-eye me-1"></i>View Report
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <div class="mb-3" style="font-size:3rem;color:#fd7e14;">
+                    <i class="bi bi-clipboard2-pulse"></i>
+                </div>
+                <h6 class="fw-bold">Admission Summary</h6>
+                <p class="text-muted small">Active and completed admission counts with a full list of current inpatients.</p>
+                <a th:href="@{/reports/admissions}" class="btn btn-warning btn-sm">
+                    <i class="bi bi-eye me-1"></i>View Report
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+</th:block>
+</body>
+</html>

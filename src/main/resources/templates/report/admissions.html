@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(pageTitle='Admission Summary', activePage='reports', content=~{::content})}">
+<body>
+<th:block th:fragment="content">
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a th:href="@{/reports}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back to Reports
+    </a>
+    <span class="text-muted small">Generated: <span th:text="${generatedAt}">-</span></span>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card text-center">
+            <div class="fs-1 fw-bold" th:text="${totalAdmissions}">0</div>
+            <div class="text-muted small">Total Admissions (All Time)</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card text-center">
+            <div class="fs-1 fw-bold text-success" th:text="${activeAdmissions}">0</div>
+            <div class="text-muted small">Currently Active</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card text-center">
+            <div class="fs-1 fw-bold text-secondary" th:text="${completedAdmissions}">0</div>
+            <div class="text-muted small">Completed (Discharged)</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-white py-3">
+        <h6 class="mb-0 fw-semibold"><i class="bi bi-clipboard2-pulse me-2"></i>Currently Active Admissions</h6>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr><th>#</th><th>Patient</th><th>Condition</th><th>Bed</th><th>Ward</th><th>Admitted On</th></tr>
+            </thead>
+            <tbody>
+                <tr th:each="a : ${activeList}">
+                    <td class="text-muted small" th:text="${a.admissionId}">#</td>
+                    <td class="fw-semibold" th:text="${a.patient.name}">Name</td>
+                    <td class="small" th:text="${a.patient.condition}">-</td>
+                    <td><span class="badge bg-dark" th:text="${a.bed.bedNumber}">BED</span></td>
+                    <td><span class="badge bg-secondary" th:text="${a.bed.wardType}">WARD</span></td>
+                    <td class="small" th:text="${#temporals.format(a.admissionDate,'dd MMM yyyy, HH:mm')}">-</td>
+                </tr>
+                <tr th:if="${activeList.isEmpty()}">
+                    <td colspan="6" class="text-center text-muted py-3">No active admissions</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</th:block>
+</body>
+</html>
