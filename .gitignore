@@ -1,0 +1,23 @@
+# Maven build folder
+target/
+
+# Logs
+*.log
+
+# Compiled files
+*.class
+
+# Environment files
+.env
+
+# Node modules (if any frontend tools used)
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files (VERY IMPORTANT)
+.vscode/
+.idea/
+*.iml
